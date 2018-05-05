@@ -26,7 +26,7 @@ void print_runtime_stats(int total_bytes, int total_attempts, double total_time)
     return;
 }
 
-uint8_t *allocate_buffer(void) {
+uint8_t *allocate_buffer(int total_size) {
     int i;
     int rand_value;
     int total_bytes;
@@ -34,14 +34,19 @@ uint8_t *allocate_buffer(void) {
     uint8_t *buffer;
 
     srand(time(NULL));
-    buffer = (uint8_t *) malloc(BYTES_TO_READ * 2);
+    buffer = (uint8_t *) malloc(total_size * 2);
 
-    for (i = 0; i < BYTES_TO_READ; i++) {
+    for (i = 0; i < total_size; i++) {
         rand_value = rand() % 0xFF;
         *(buffer + i) = (uint8_t) rand_value;
     }
 
     return buffer;
+}
+
+void print_usage(char *argv[]) {
+    printf("%s <block_size> <total_size>\n", argv[0]);
+    return;
 }
 
 int main(int argc, char *argv[]) {
@@ -50,12 +55,21 @@ int main(int argc, char *argv[]) {
     int total_bytes;
     int total_attempts;
     uint8_t *fbuf;
-    uint8_t *foo;
+
+    if (argc < 3) {
+        print_usage(argv);
+        exit(0);
+    }
+
+    int block_size = atoi(argv[1]);
+    int total_size = atoi(argv[2]);
 
     printf("named_pipe IPC server test\n");
+    printf("using block_size = %d\n", block_size);
+    printf("using total_size = %d\n", total_size);
 
-    printf("allocating random buffer of length %d bytes\n", BYTES_TO_READ);
-    fbuf = allocate_buffer();
+    printf("allocating random buffer of length %d bytes\n", total_size);
+    fbuf = allocate_buffer(total_size);
 
     if (!fbuf) {
         printf("error could not allocate memory\n");
@@ -72,7 +86,7 @@ int main(int argc, char *argv[]) {
     }
 
     while (1) {
-        n = write(fd, fbuf + total_bytes, BUFFER_BYTES_LENGTH);
+        n = write(fd, fbuf + total_bytes, block_size);
 
         if (n < 0) {
             perror("write");
@@ -82,12 +96,12 @@ int main(int argc, char *argv[]) {
             total_attempts++;
         }
 
-        if (total_bytes >= BYTES_TO_READ * 2) {
+        if (total_bytes >= total_size * 2) {
             break;
         }
     }
 
-    //free(fbuf);
+    free(fbuf);
     close(fd);
 
     return 0;

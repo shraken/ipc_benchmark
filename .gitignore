@@ -2,3 +2,4 @@
 .vscode/
 named_pipe/client/client
 named_pipe/server/server
+pipe/main

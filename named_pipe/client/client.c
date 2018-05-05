@@ -25,6 +25,11 @@ void print_runtime_stats(int total_bytes, int total_attempts, double total_time)
     return;
 }
 
+void print_usage(char *argv[]) {
+    printf("%s <block_size> <total_size>\n", argv[0]);
+    return;
+}
+
 int main(int argc, char *argv[]) {
     int fd;
     int result;
@@ -35,7 +40,17 @@ int main(int argc, char *argv[]) {
     uint8_t tbuf[BUFFER_BYTES_LENGTH];
     struct timeval t_start, t_end;
 
+    if (argc < 3) {
+        print_usage(argv);
+        exit(0);
+    }
+
+    int block_size = atoi(argv[1]);
+    int total_size = atoi(argv[2]);
+
     printf("named_pipe IPC client test\n");
+    printf("using block_size = %d\n", block_size);
+    printf("using total_size = %d\n", total_size);
 
     remove(fifo_name);
     result = mkfifo(fifo_name, 0666);
@@ -58,7 +73,7 @@ int main(int argc, char *argv[]) {
     
     // read 
     while (1) {
-        n = read(fd, tbuf, BUFFER_BYTES_LENGTH);
+        n = read(fd, tbuf, block_size);
 
         if (n < 0) {
             perror("read");
@@ -68,7 +83,7 @@ int main(int argc, char *argv[]) {
             total_attempts++;
         }
 
-        if (total_bytes >= BYTES_TO_READ) {
+        if (total_bytes >= total_size) {
             break;
         }
     }

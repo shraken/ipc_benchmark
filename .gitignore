@@ -3,3 +3,5 @@
 named_pipe/client/client
 named_pipe/server/server
 pipe/main
+msg_queue/client/client
+msg_queue/server/server

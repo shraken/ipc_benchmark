@@ -12,8 +12,8 @@ The following IPC tests are provided:
 1. pipe
 2. named_pipe
 3. unix domain sockets (uds)
+4. socketpair
 4. tcp
-5. udp
 6. shm
 7. message queue
 

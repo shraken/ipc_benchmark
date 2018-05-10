@@ -7,3 +7,6 @@ msg_queue/client/client
 msg_queue/server/server
 uds/client/client
 uds/server/server
+socketpair/main
+tcp/client/client
+tcp/server/server

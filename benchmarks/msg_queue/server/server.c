@@ -14,44 +14,12 @@
 
 #include <common.h>
 
+typedef struct _msg_queue_entry {
+    long mtype;
+    char mtext[200];
+} msg_queue_entry;
+
 static char *msgqueue_name = "server.c";
-
-void print_runtime_stats(int total_bytes, int total_attempts, double total_time) {
-    double average_throughput;
-
-    average_throughput = (double) total_bytes / total_time;
-    
-    printf("\n=========================================\n");
-    printf("Average Throughput: %f MBytes/sec\n", average_throughput / 1e6);
-    printf("Test took: %f secs with %d bytes\n", total_time, total_bytes);
-    printf("Number of read calls on named pipe: %d\n", total_attempts);
-    printf("=========================================\n");
-    
-    return;
-}
-
-uint8_t *allocate_buffer(int total_size) {
-    int i;
-    int rand_value;
-    int total_bytes;
-    int total_attempts;
-    uint8_t *buffer;
-
-    srand(time(NULL));
-    buffer = (uint8_t *) malloc(total_size * 2);
-
-    for (i = 0; i < total_size; i++) {
-        rand_value = rand() % 0xFF;
-        *(buffer + i) = (uint8_t) rand_value;
-    }
-
-    return buffer;
-}
-
-void print_usage(char *argv[]) {
-    printf("%s <block_size> <total_size>\n", argv[0]);
-    return;
-}
 
 int main(int argc, char *argv[]) {
     int n;
@@ -64,14 +32,13 @@ int main(int argc, char *argv[]) {
     double total_time;
     struct timeval t_start, t_end;
 
-    if (argc < 3) {
-        print_usage(argv);
-        exit(0);
-    }
 
-    int block_size = atoi(argv[1]);
-    int total_size = atoi(argv[2]);
+    bool pretty_mode;
+    int block_size;
+    int total_size;
 
+    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
+    
     printf("msg_queue IPC server test\n");
     printf("using block_size = %d\n", block_size);
     printf("using total_size = %d\n", total_size);
@@ -97,7 +64,8 @@ int main(int argc, char *argv[]) {
     }
 
     entry.mtype = 1;
-
+    total_bytes = 0;
+    
     while (1) {
         memcpy(entry.mtext, fbuf + (total_bytes % total_size), sizeof(entry.mtext));
 

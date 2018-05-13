@@ -14,26 +14,12 @@
 
 #include <common.h>
 
+typedef struct _msg_queue_entry {
+    long mtype;
+    char mtext[200];
+} msg_queue_entry;
+
 static char *msgqueue_name = "../server/server.c";
-
-void print_runtime_stats(int total_bytes, int total_attempts, double total_time) {
-    double average_throughput;
-
-    average_throughput = (double) total_bytes / total_time;
-    
-    printf("\n=========================================\n");
-    printf("Average Throughput: %f MBytes/sec\n", average_throughput / 1e6);
-    printf("Test took: %f secs with %d bytes\n", total_time, total_bytes);
-    printf("Number of read calls on named pipe: %d\n", total_attempts);
-    printf("=========================================\n");
-    
-    return;
-}
-
-void print_usage(char *argv[]) {
-    printf("%s <block_size> <total_size>\n", argv[0]);
-    return;
-}
 
 int main(int argc, char *argv[]) {
     int n;
@@ -45,14 +31,11 @@ int main(int argc, char *argv[]) {
     msg_queue_entry entry;
     struct timeval t_start, t_end;
 
-    if (argc < 3) {
-        print_usage(argv);
-        exit(0);
-    }
+    bool pretty_mode;
+    int block_size;
+    int total_size;
 
-    int block_size = atoi(argv[1]);
-    int total_size = atoi(argv[2]);
-
+    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
     printf("msg_queue IPC client test\n");
     printf("using block_size = %d\n", block_size);
     printf("using total_size = %d\n", total_size);

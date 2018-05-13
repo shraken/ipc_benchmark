@@ -7,7 +7,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include <common.h>
+#define BUFFER_BYTES_LENGTH 8192
 
 static char *fifo_name = "/tmp/ipc_fifo";
 

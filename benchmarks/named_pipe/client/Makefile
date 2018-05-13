@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS=-c -Wall -I../common/
+CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=server.c
+SOURCES=client.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=server
+EXECUTABLE=client
 
 all: $(SOURCES) $(EXECUTABLE)
     

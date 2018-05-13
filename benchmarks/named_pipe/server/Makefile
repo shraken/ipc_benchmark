@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -Wall -I../common/
+CFLAGS=-c -Wall
 LDFLAGS=
 SOURCES=server.c
 OBJECTS=$(SOURCES:.c=.o)

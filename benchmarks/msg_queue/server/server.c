@@ -38,12 +38,14 @@ int main(int argc, char *argv[]) {
     int total_size;
 
     parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
-    
+
+    /*
     printf("msg_queue IPC server test\n");
     printf("using block_size = %d\n", block_size);
     printf("using total_size = %d\n", total_size);
+    */
 
-    printf("allocating random buffer of length %d bytes\n", total_size);
+    // printf("allocating random buffer of length %d bytes\n", total_size);
     fbuf = allocate_buffer(total_size);
 
     if (!fbuf) {
@@ -88,7 +90,7 @@ int main(int argc, char *argv[]) {
     total_time = (double) (t_end.tv_sec - t_start.tv_sec);
     total_time += (double) (t_end.tv_usec - t_start.tv_usec) / 1000000;
 
-    print_runtime_stats(total_bytes, total_attempts, total_time);
+    print_runtime_stats(pretty_mode, total_bytes, total_attempts, total_time);
     
     return 0;
 }

@@ -11,6 +11,10 @@ int parse_arguments(int argc, char *argv[], int *block_size, int *total_size, bo
     int parse_block_size;
     int parse_total_size;
     
+    if ((!block_size) || (!total_size) || (!pretty_mode)) {
+        return -1;
+    }
+
     if (argc < 3) {
         print_usage(argv);
         exit(0);
@@ -44,20 +48,10 @@ int parse_arguments(int argc, char *argv[], int *block_size, int *total_size, bo
                 abort();
         }
     }
-    
-    printf("parse_arguments()\n");
-    printf("parse_pretty_mode = %d\n", parse_pretty_mode);
-    printf("parse_block_size = %d\n", parse_block_size);
-    printf("parse_total_size = %d\n", parse_total_size);
 
     *pretty_mode = parse_pretty_mode;
-    printf("A\n");
-
     *block_size = parse_block_size;
-    printf("B\n");
-
     *total_size = parse_total_size;
-    printf("C\n");
 
     return 0;
 }
@@ -80,16 +74,21 @@ uint8_t *allocate_buffer(int total_size) {
     return buffer;
 }
 
-void print_runtime_stats(int total_bytes, int total_attempts, double total_time) {
+void print_runtime_stats(bool pretty_mode, int total_bytes, int total_attempts, double total_time) {
     double average_throughput;
 
     average_throughput = (double) total_bytes / total_time;
     
-    printf("\n=========================================\n");
-    printf("Average Throughput: %f MBytes/sec\n", average_throughput / 1e6);
-    printf("Test took: %f secs with %d bytes\n", total_time, total_bytes);
-    printf("Number of read calls on named pipe: %d\n", total_attempts);
-    printf("=========================================\n");
-    
+    if (pretty_mode) {
+        printf("\n=========================================\n");
+        printf("Average Throughput: %f MBytes/sec\n", average_throughput / 1e6);
+        printf("Test took: %f secs with %d bytes\n", total_time, total_bytes);
+        printf("Number of read calls on named pipe: %d\n", total_attempts);
+        printf("=========================================\n");
+    } else {
+        printf("%f,%f,%d,%d\n", (average_throughput / 1e6), total_time, 
+            total_bytes, total_attempts);
+    }
+
     return;
 }

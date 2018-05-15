@@ -12,44 +12,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#define MAX_BUFFER_LENGTH 16384
-
-void print_runtime_stats(int total_bytes, int total_attempts, double total_time) {
-    double average_throughput;
-
-    average_throughput = (double) total_bytes / total_time;
-    
-    printf("\n=========================================\n");
-    printf("Average Throughput: %f MBytes/sec\n", average_throughput / 1e6);
-    printf("Test took: %f secs with %d bytes\n", total_time, total_bytes);
-    printf("Number of read calls on named pipe: %d\n", total_attempts);
-    printf("=========================================\n");
-    
-    return;
-}
-
-uint8_t *allocate_buffer(int total_size) {
-    int i;
-    int rand_value;
-    int total_bytes;
-    int total_attempts;
-    uint8_t *buffer;
-
-    srand(time(NULL));
-    buffer = (uint8_t *) malloc(total_size * 2);
-
-    for (i = 0; i < total_size; i++) {
-        rand_value = rand() % 0xFF;
-        *(buffer + i) = (uint8_t) rand_value;
-    }
-
-    return buffer;
-}
-
-void print_usage(char *argv[]) {
-    printf("%s <block_size> <total_size>\n", argv[0]);
-    return;
-}
+#include <common.h>
 
 int main(int argc, char *argv[]) {
     int fd[2];
@@ -62,22 +25,11 @@ int main(int argc, char *argv[]) {
     uint8_t *tbuf;
     uint8_t *fbuf;
 
-    if (argc < 3) {
-        print_usage(argv);
-        exit(1);
-    }
+    bool pretty_mode;
+    int block_size;
+    int total_size;
 
-    int block_size = atoi(argv[1]);
-    int total_size = atoi(argv[2]);
-
-    if (block_size > MAX_BUFFER_LENGTH) {
-        printf("block_size parameter invalid\n");
-        exit(1);
-    }
-
-    printf("named_pipe IPC client test\n");
-    printf("using block_size = %d\n", block_size);
-    printf("using total_size = %d\n", total_size);
+    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
 
     fbuf = allocate_buffer(total_size);
 
@@ -86,6 +38,8 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    total_bytes = 0;
+    
     if ((child_pid = fork()) == -1) {
         perror("fork");
         exit(1);
@@ -135,7 +89,7 @@ int main(int argc, char *argv[]) {
         total_time = (double) (t_end.tv_sec - t_start.tv_sec);
         total_time += (double) (t_end.tv_usec - t_start.tv_usec) / 1000000;
 
-        print_runtime_stats(total_bytes, total_attempts, total_time);
+        print_runtime_stats(pretty_mode, total_bytes, total_attempts, total_time);
         free(tbuf);
     }
 

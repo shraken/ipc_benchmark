@@ -18,6 +18,9 @@
 
 #include <common.h>
 
+#define SERVER_PORT "5000"
+#define SERVER_HOST "localhost"
+
 // based off Beej's Network example code
 // https://beej.us/guide/bgnet/html/multi/clientserver.html#simpleserver
 
@@ -31,41 +34,6 @@ void *get_in_addr(struct sockaddr *sa)
     }
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
-
-uint8_t *allocate_buffer(int total_size) {
-    int i;
-    int rand_value;
-    uint8_t *buffer;
-
-    srand(time(NULL));
-    buffer = (uint8_t *) malloc(total_size * 2);
-
-    for (i = 0; i < total_size; i++) {
-        rand_value = rand() % 0xFF;
-        *(buffer + i) = (uint8_t) rand_value;
-    }
-
-    return buffer;
-}
-
-void print_runtime_stats(int total_bytes, int total_attempts, double total_time) {
-    double average_throughput;
-
-    average_throughput = (double) total_bytes / total_time;
-    
-    printf("\n=========================================\n");
-    printf("Average Throughput: %f MBytes/sec\n", average_throughput / 1e6);
-    printf("Test took: %f secs with %d bytes\n", total_time, total_bytes);
-    printf("Number of read calls on named pipe: %d\n", total_attempts);
-    printf("=========================================\n");
-    
-    return;
-}
-
-void print_usage(char *argv[]) {
-    printf("%s <block_size> <total_size>\n", argv[0]);
-    return;
 }
 
 int main(int argc, char *argv[]) {
@@ -84,19 +52,12 @@ int main(int argc, char *argv[]) {
     socklen_t sin_size;
     char s[INET6_ADDRSTRLEN];
 
-    if (argc < 3) {
-        print_usage(argv);
-        exit(0);
-    }
+    bool pretty_mode;
+    int block_size;
+    int total_size;
 
-    int block_size = atoi(argv[1]);
-    int total_size = atoi(argv[2]);
+    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
 
-    printf("tcp IPC server test\n");
-    printf("using block_size = %d\n", block_size);
-    printf("using total_size = %d\n", total_size);
-
-    printf("allocating random buffer of length %d bytes\n", total_size);
     fbuf = allocate_buffer(total_size);
 
     if (!fbuf) {
@@ -162,10 +123,10 @@ int main(int argc, char *argv[]) {
     inet_ntop(their_addr.ss_family,
         get_in_addr((struct sockaddr *)&their_addr),
         s, sizeof s);
-    printf("server: got connection from %s\n", s);
+    //printf("server: got connection from %s\n", s);
 
     while (1) {
-        if (n = send(new_fd,  fbuf + total_bytes, block_size, 0) == -1) {
+        if ((n = send(new_fd,  fbuf + total_bytes, block_size, 0)) == -1) {
             perror("send");
             exit(1);
         }
@@ -189,6 +150,7 @@ int main(int argc, char *argv[]) {
     total_time = (double) (t_end.tv_sec - t_start.tv_sec);
     total_time += (double) (t_end.tv_usec - t_start.tv_usec) / 1000000;
 
-    print_runtime_stats(total_bytes, total_attempts, total_time);
+    print_runtime_stats(pretty_mode, total_bytes, total_attempts, total_time);
+
     return 0;
 }

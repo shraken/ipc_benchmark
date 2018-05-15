@@ -10,7 +10,6 @@
 
 #include <common.h>
 
-
 static char *fifo_name = "/tmp/ipc_fifo";
 
 int main(int argc, char *argv[]) {

@@ -15,27 +15,12 @@
 
 #include <common.h>
 
+#define BUFFER_BYTES_LENGTH 8192
+#define SERVER_PORT "5000"
+#define SERVER_HOST "localhost"
+
 // based off Beej's Network example code
 // https://beej.us/guide/bgnet/html/multi/clientserver.html#simpleserver
-
-void print_runtime_stats(int total_bytes, int total_attempts, double total_time) {
-    double average_throughput;
-
-    average_throughput = (double) total_bytes / total_time;
-    
-    printf("\n=========================================\n");
-    printf("Average Throughput: %f MBytes/sec\n", average_throughput / 1e6);
-    printf("Test took: %f secs with %d bytes\n", total_time, total_bytes);
-    printf("Number of read calls on named pipe: %d\n", total_attempts);
-    printf("=========================================\n");
-    
-    return;
-}
-
-void print_usage(char *argv[]) {
-    printf("%s <block_size> <total_size>\n", argv[0]);
-    return;
-}
 
 void *get_in_addr(struct sockaddr *sa)
 {
@@ -58,22 +43,11 @@ int main(int argc, char *argv[]) {
     char s[INET6_ADDRSTRLEN];
     struct addrinfo hints, *servinfo, *p;
 
-    if (argc < 3) {
-        print_usage(argv);
-        exit(0);
-    }
+    bool pretty_mode;
+    int block_size;
+    int total_size;
 
-    int block_size = atoi(argv[1]);
-    int total_size = atoi(argv[2]);
-
-    printf("tcp IPC client test\n");
-    printf("using block_size = %d\n", block_size);
-    printf("using total_size = %d\n", total_size);
-
-    if (block_size > BUFFER_BYTES_LENGTH) {
-        printf("error: block_size out of range\n");
-        exit(1);
-    }
+    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
@@ -107,7 +81,7 @@ int main(int argc, char *argv[]) {
 
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
             s, sizeof s);
-    printf("client: connecting to %s\n", s);
+    //printf("client: connecting to %s\n", s);
 
     freeaddrinfo(servinfo);
 
@@ -138,7 +112,7 @@ int main(int argc, char *argv[]) {
     total_time = (double) (t_end.tv_sec - t_start.tv_sec);
     total_time += (double) (t_end.tv_usec - t_start.tv_usec) / 1000000;
 
-    print_runtime_stats(total_bytes, total_attempts, total_time);
+    print_runtime_stats(pretty_mode, total_bytes, total_attempts, total_time);
 
     return 0;
 }

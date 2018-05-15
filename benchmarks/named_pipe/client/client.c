@@ -7,28 +7,11 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include <common.h>
+
 #define BUFFER_BYTES_LENGTH 8192
 
 static char *fifo_name = "/tmp/ipc_fifo";
-
-void print_runtime_stats(int total_bytes, int total_attempts, double total_time) {
-    double average_throughput;
-
-    average_throughput = (double) total_bytes / total_time;
-    
-    printf("\n=========================================\n");
-    printf("Average Throughput: %f MBytes/sec\n", average_throughput / 1e6);
-    printf("Test took: %f secs with %d bytes\n", total_time, total_bytes);
-    printf("Number of read calls on named pipe: %d\n", total_attempts);
-    printf("=========================================\n");
-    
-    return;
-}
-
-void print_usage(char *argv[]) {
-    printf("%s <block_size> <total_size>\n", argv[0]);
-    return;
-}
 
 int main(int argc, char *argv[]) {
     int fd;
@@ -40,17 +23,11 @@ int main(int argc, char *argv[]) {
     uint8_t tbuf[BUFFER_BYTES_LENGTH];
     struct timeval t_start, t_end;
 
-    if (argc < 3) {
-        print_usage(argv);
-        exit(0);
-    }
+    bool pretty_mode;
+    int block_size;
+    int total_size;
 
-    int block_size = atoi(argv[1]);
-    int total_size = atoi(argv[2]);
-
-    printf("named_pipe IPC client test\n");
-    printf("using block_size = %d\n", block_size);
-    printf("using total_size = %d\n", total_size);
+    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
 
     remove(fifo_name);
     result = mkfifo(fifo_name, 0666);
@@ -94,7 +71,7 @@ int main(int argc, char *argv[]) {
     total_time = (double) (t_end.tv_sec - t_start.tv_sec);
     total_time += (double) (t_end.tv_usec - t_start.tv_usec) / 1000000;
 
-    print_runtime_stats(total_bytes, total_attempts, total_time);
+    print_runtime_stats(pretty_mode, total_bytes, total_attempts, total_time);
 
     return 0;
 }

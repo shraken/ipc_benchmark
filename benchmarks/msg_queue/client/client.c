@@ -36,12 +36,6 @@ int main(int argc, char *argv[]) {
     int total_size;
 
     parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
-    
-    /*
-    printf("msg_queue IPC client test\n");
-    printf("using block_size = %d\n", block_size);
-    printf("using total_size = %d\n", total_size);
-    */
    
     //remove(msgqueue_name);
     if ((key = ftok(msgqueue_name, 'B')) == -1) {

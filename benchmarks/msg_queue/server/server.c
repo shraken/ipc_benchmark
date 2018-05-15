@@ -32,18 +32,11 @@ int main(int argc, char *argv[]) {
     double total_time;
     struct timeval t_start, t_end;
 
-
     bool pretty_mode;
     int block_size;
     int total_size;
 
     parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
-
-    /*
-    printf("msg_queue IPC server test\n");
-    printf("using block_size = %d\n", block_size);
-    printf("using total_size = %d\n", total_size);
-    */
 
     // printf("allocating random buffer of length %d bytes\n", total_size);
     fbuf = allocate_buffer(total_size);

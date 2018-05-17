@@ -1,4 +1,6 @@
 *.o
+*.dat
+*.html
 .vscode/
 benchmarks/named_pipe/client/client
 benchmarks/named_pipe/server/server

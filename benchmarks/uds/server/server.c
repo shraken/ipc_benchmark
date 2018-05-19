@@ -46,18 +46,16 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    //printf("Connecting to %s\n", SOCK_PATH);
-
     remote.sun_family = AF_UNIX;
     strcpy(remote.sun_path, SOCK_PATH);
-    len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+    len = strlen(remote.sun_path) + sizeof(remote.sun_family) + 1;
+
     if (connect(s, (struct sockaddr *)&remote, len) == -1) {
         perror("connect");
         exit(1);
     }
 
-    //printf("Connected to %s\n", SOCK_PATH);
-
+    total_bytes = 0;
     while (1) {
         if ((n = send(s,  fbuf + total_bytes, block_size, 0)) == -1) {
             perror("send");

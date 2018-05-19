@@ -61,9 +61,9 @@ ipcResults = {
     }
 }
 
-def benchmark_test(block_size, total_size, base_dir, single_proc, delay=0, fliporder=False):
+def benchmark_test(block_size, total_size, base_dir, single_proc, delay=0, fliporder=False, killattempt=True):
     global ipcResults
-    result = benchmark_test_run(block_size, total_size, base_dir, single_proc, delay, fliporder)
+    result = benchmark_test_run(block_size, total_size, base_dir, single_proc, delay, fliporder, killattempt)
 
     resultSplit = result.split(',')
     nameSplit = resultSplit[0].split('/')
@@ -74,7 +74,7 @@ def benchmark_test(block_size, total_size, base_dir, single_proc, delay=0, flipo
     name = nameSplit[1]
     ipcResults[name][block_size].append(float(resultSplit[1]))
 
-def benchmark_test_run(block_size, total_size, base_dir, single_proc, delay=0, fliporder=False):
+def benchmark_test_run(block_size, total_size, base_dir, single_proc, delay=0, fliporder=False, killattempt=True):
     if single_proc:
         both_proc = subprocess.Popen('./main -b {} -c {}'.format(block_size, total_size),
                                      cwd=base_dir,
@@ -122,7 +122,8 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc, delay=0, f
         for line in client_proc.stdout:
             benchRow += line
 
-        os.killpg(os.getpgid(server_proc.pid), signal.SIGTERM)
+        if killattempt:
+            os.killpg(os.getpgid(server_proc.pid), signal.SIGTERM)
 
     print 'benchRow = {}'.format(benchRow)
     return benchRow
@@ -137,7 +138,7 @@ def ipc_benchmark_run(save_file, trial_runs, verbose):
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_NAMED_PIPE_DIR, False)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_PIPE_DIR, True)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_SOCKET_PAIR_DIR, True)
-            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, False, delay=2.0)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, False, delay=2.0, killattempt=False)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_UDS_DIR, False, fliporder=True)
 
     if verbose:

@@ -42,10 +42,11 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    memset(&local, 0, sizeof(local));
     local.sun_family = AF_UNIX;
     strcpy(local.sun_path, SOCK_PATH);
     unlink(local.sun_path);
-    len = strlen(local.sun_path) + sizeof(local.sun_family);
+    len = strlen(local.sun_path) + sizeof(local.sun_family) + 1;
 
     if (bind(s, (struct sockaddr *) &local, len) == -1) {
         perror("bind");
@@ -64,8 +65,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    //printf("Connected!\n");
-
+    total_bytes = 0;
     while (1) {
         n = recv(sockfd, tbuf, block_size, 0);
 

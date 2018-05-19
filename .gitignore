@@ -2,6 +2,7 @@
 *.dat
 *.html
 .vscode/
+figures/
 benchmarks/named_pipe/client/client
 benchmarks/named_pipe/server/server
 benchmarks/pipe/main

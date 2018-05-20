@@ -162,7 +162,7 @@ def plotResults(filename):
 
     return (resultMean, resultStd)
 
-resultLoad = plotResults('ipc_result2.dat')
+resultLoad = plotResults('macos_test.dat')
 
 print('resultLoad')
 print(resultLoad)

@@ -147,12 +147,12 @@ def ipc_benchmark_run(save_file, trial_runs, verbose):
 
     for trialRun in xrange(int(trial_runs)):
         for bsize in blockSizes:
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_MSG_QUEUE_DIR, singleproc=False)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_NAMED_PIPE_DIR, singleproc=False)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_PIPE_DIR, singleproc=True)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_SOCKET_PAIR_DIR, singleproc=True)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_MSG_QUEUE_DIR, single_proc=False)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_NAMED_PIPE_DIR, single_proc=False)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_PIPE_DIR, single_proc=True)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_SOCKET_PAIR_DIR, single_proc=True)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, single_proc=False, delay=2.0, killattempt=False)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_UDS_DIR, singleproc=False, fliporder=True)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_UDS_DIR, single_proc=False, fliporder=True)
 
     if verbose:
         global ipcResults

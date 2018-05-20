@@ -63,16 +63,29 @@ ipcResults = {
 
 def benchmark_test(block_size, total_size, base_dir, single_proc, delay=0, fliporder=False, killattempt=True):
     global ipcResults
-    result = benchmark_test_run(block_size, total_size, base_dir, single_proc, delay, fliporder, killattempt)
+    
+    for attempts in xrange(5):
+        result = benchmark_test_run(block_size, total_size, base_dir, single_proc, delay, fliporder, killattempt)
+    
+        try:
+            resultSplit = result.split(',')
+            nameSplit = resultSplit[0].split('/')
+        except ValueError:
+            time.sleep(2)
+            continue
 
-    resultSplit = result.split(',')
-    nameSplit = resultSplit[0].split('/')
+        print 'name = {}'.format(nameSplit[1])
+        print 'rate = {}'.format(resultSplit[1])
 
-    print 'name = {}'.format(nameSplit[1])
-    print 'rate = {}'.format(resultSplit[1])
+        name = nameSplit[1]
+        ipcResults[name][block_size].append(float(resultSplit[1]))
+        break
 
-    name = nameSplit[1]
-    ipcResults[name][block_size].append(float(resultSplit[1]))
+    if attempts >= 5:
+        print 'FAILURE, bad result'
+        return False
+    else:
+        return True
 
 def benchmark_test_run(block_size, total_size, base_dir, single_proc, delay=0, fliporder=False, killattempt=True):
     if single_proc:
@@ -122,8 +135,8 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc, delay=0, f
         for line in client_proc.stdout:
             benchRow += line
 
-        if killattempt:
-            os.killpg(os.getpgid(server_proc.pid), signal.SIGTERM)
+        #if killattempt:
+        os.killpg(os.getpgid(server_proc.pid), signal.SIGTERM)
 
     print 'benchRow = {}'.format(benchRow)
     return benchRow

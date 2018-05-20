@@ -137,7 +137,8 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, dela
 
         #if killattempt:
         #os.killpg(os.getpgid(server_proc.pid), signal.SIGTERM)
-
+        server_proc.kill()
+        
     print 'benchRow = {}'.format(benchRow)
     return benchRow
 

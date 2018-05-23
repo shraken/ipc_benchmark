@@ -1,11 +1,14 @@
 # ipc_benchmark
 
 Standard IPC benchmark examples.  Binaries allow specification of block size and
-total transfer size.  A randomized dataset is always transferred to minimize
-cache influence ensuring worst-cse performance for the test.
+total transfer size.  A random set of data with a total transfer size is built on
+the heap as a source for IPC data.  
 
 An evaluation python test script to serially run the IPC benchmarks collecting
-the results into a report is included.  
+the results and saving it into a pickle file.
+
+Lastly, a companion `pweave` markdown is provided for processing and plotting
+of the benchmark pickle'd file.  
 
 The following IPC tests are provided:
 
@@ -42,9 +45,12 @@ optional arguments:
 ## Running It
 
 ```console
-shraken@mint-vbox ~/shraken_code/ipc_benchmark $ python benchmark.py -v -t 100 -f result.dat
+python benchmark.py -v -t 100 -f result.dat
+
+pweave -i markdown -f pandoc -o ipc_report.md ipc_report.pmd       
+
 ```
 
 # Results
 
-Results for Linux, FreeBSD, and mac OS are provided in the results/ directory.  
+Results for Linux, FreeBSD, and mac OS are provided in the results/ directory.  The raw sets recorded are also provided in results/dat.

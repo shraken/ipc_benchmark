@@ -1,5 +1,10 @@
 # IPC Report
 
+FreeBSD 11.1 release
+
+Intel Core i7-4930K
+16GB DDR3
+
 ## Requirements
 
 python 3.6.x

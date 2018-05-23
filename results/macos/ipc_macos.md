@@ -1,5 +1,8 @@
 # IPC Report
 
+MacBook Pro, 2016.  2.7 GHz Intel Core i7 Skylake 6820HQ
+16 GB 2133 MHz LPDDR3
+
 ## Requirements
 
 python 3.6.x

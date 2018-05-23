@@ -1,5 +1,11 @@
 # IPC Report
 
+Virtual Machine, VirtualBox Ubuntu Linux 16.04
+4.10.0-28 kernel
+
+MacBook Pro, 2016.  2.7 GHz Intel Core i7 Skylake 6820HQ
+16 GB 2133 MHz LPDDR3
+
 ## Requirements
 
 python 3.6.x

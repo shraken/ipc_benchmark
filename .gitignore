@@ -1,6 +1,7 @@
 *.o
 *.dat
 *.html
+*.DS_Store
 .vscode/
 benchmarks/named_pipe/client/client
 benchmarks/named_pipe/server/server

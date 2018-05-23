@@ -3,6 +3,7 @@
 ## Requirements
 
 python 3.6.x
+
 pweave
 
 ## Usage
@@ -33,38 +34,31 @@ shraken@mint-vbox ~/shraken_code/ipc_benchmark $ python benchmark.py -v -t 100 -
 The figure below compares the throughput (MB/sec) for the different IPC methods when varying the block
 size of transmission.  The transfer size for each test is fixed at 100 Megabytes.  
 
-The best performance was TCP with a block size of 8192 but the socketpair
-method with block size of 8192 was almost as much with better repeatability.
-
-The worst case performance was msg_queue and the unix domain socket.
-
-These results are interesting as unix domain sockets are often advocated
-for as a superior 
-
 
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 from pprint import pprint
+from prettytable import PrettyTable
 
 IPC_BLOCK_SIZE_1024 = 1024
 IPC_BLOCK_SIZE_2048 = 2048
 IPC_BLOCK_SIZE_4096 = 4096
 IPC_BLOCK_SIZE_8192 = 8192
 
+typesToParse = [ 'msg_queue', 'named_pipe', 'pipe', 'socketpair', 'tcp', 'uds' ]
+blockSizeList = [ IPC_BLOCK_SIZE_1024, IPC_BLOCK_SIZE_2048, 
+                  IPC_BLOCK_SIZE_4096, IPC_BLOCK_SIZE_8192 ]
+
 def getMaxMinValue(results, key):
-    return [ max(results), min(results) ]
+    return (0, 0)
+    #return [ max(results), min(results) ]
 
 def plotResults(filename):
     with open(filename, "rb") as handle:
         result = pickle.load(handle)
     
-        #print(result)
-
-    typesToParse = [ 'msg_queue', 'named_pipe', 'pipe', 'socketpair', 'tcp', 'uds' ]
-    blockSizeList = [ IPC_BLOCK_SIZE_1024, IPC_BLOCK_SIZE_2048, 
-                     IPC_BLOCK_SIZE_4096, IPC_BLOCK_SIZE_8192 ]
     colorTypes = [ 'r', 'b', 'g', 'c', 'm', 'y' ]
 
     n_groups = 4
@@ -120,7 +114,44 @@ def plotResults(filename):
         }
     }
 
-    resultStd = resultMean
+    resultStd = {
+        'msg_queue' : {
+            IPC_BLOCK_SIZE_1024: [],
+            IPC_BLOCK_SIZE_2048: [],
+            IPC_BLOCK_SIZE_4096: [],
+            IPC_BLOCK_SIZE_8192: [],
+        },
+        'named_pipe': {
+            IPC_BLOCK_SIZE_1024: [],
+            IPC_BLOCK_SIZE_2048: [],
+            IPC_BLOCK_SIZE_4096: [],
+            IPC_BLOCK_SIZE_8192: [],
+        },
+        'pipe': {
+            IPC_BLOCK_SIZE_1024: [],
+            IPC_BLOCK_SIZE_2048: [],
+            IPC_BLOCK_SIZE_4096: [],
+            IPC_BLOCK_SIZE_8192: [],
+        },
+        'socketpair': {
+            IPC_BLOCK_SIZE_1024: [],
+            IPC_BLOCK_SIZE_2048: [],
+            IPC_BLOCK_SIZE_4096: [],
+            IPC_BLOCK_SIZE_8192: [],
+        },
+        'tcp': {
+            IPC_BLOCK_SIZE_1024: [],
+            IPC_BLOCK_SIZE_2048: [],
+            IPC_BLOCK_SIZE_4096: [],
+            IPC_BLOCK_SIZE_8192: [],
+        },
+        'uds': {
+            IPC_BLOCK_SIZE_1024: [],
+            IPC_BLOCK_SIZE_2048: [],
+            IPC_BLOCK_SIZE_4096: [],
+            IPC_BLOCK_SIZE_8192: [],
+        }
+    }
 
     for idx, typeParse in enumerate(typesToParse):
         means_temp = ( np.mean(result[typeParse][IPC_BLOCK_SIZE_1024]),
@@ -144,14 +175,6 @@ def plotResults(filename):
             resultMean[typeParse][blockSize] = blockMean
             resultStd[typeParse][blockSize] = blockStd
 
-    '''
-    print('resultMean')
-    print(resultMean)
-
-    print('resultStd')
-    print(resultStd)
-    '''
-
     plt.xlabel('Type')
     plt.ylabel('Rate (MB/sec)')
     plt.title('IPC Throughput v. Block size')
@@ -163,101 +186,46 @@ def plotResults(filename):
 
     return (resultMean, resultStd)
 
-resultLoad = plotResults('results/freebsd_result.dat')
+(resultMean, resultStd) = plotResults('results/dat/macos_result.dat')
 
-print('resultLoad')
-print(resultLoad)
+headers = ['', 
+           '{:^12}'.format(IPC_BLOCK_SIZE_1024), 
+           '{:^12}'.format(IPC_BLOCK_SIZE_2048), 
+           '{:^12}'.format(IPC_BLOCK_SIZE_4096), 
+           '{:^12}'.format(IPC_BLOCK_SIZE_8192) ]
+t = PrettyTable(headers)
 
-#[maxMsgQueue, minMsgQueue] = getMaxMinValue(result, 'msg_queue')
-#print('maxMsgQueue')
-#print(maxMsgQueue)
-#print('minMsgQueue')
-#print(minMsgQueue)
+for ipcType in typesToParse:
+    data = [ '{}'.format(ipcType),
+             '{0:.2f}'.format(resultMean[ipcType][IPC_BLOCK_SIZE_1024]),
+             '{0:.2f}'.format(resultMean[ipcType][IPC_BLOCK_SIZE_2048]),
+             '{0:.2f}'.format(resultMean[ipcType][IPC_BLOCK_SIZE_4096]),
+             '{0:.2f}'.format(resultMean[ipcType][IPC_BLOCK_SIZE_8192]) ]
+
+    t.add_row(data)
+
+print(t)
 ```
 
 ```
-resultLoad
-({'msg_queue': {1024: 0.11100467330422437, 2048: 0.13008069645108133,
-4096: 0.158288796374672, 8192: 0.1215073603766968}, 'named_pipe':
-{1024: 73.3392041589776, 2048: 24.89879370355345, 4096:
-42.39128652328577, 8192: 34.067821818385106}, 'pipe': {1024:
-56.3953441721408, 2048: 43.54290340995699, 4096: 50.87995500803582,
-8192: 35.8759686925718}, 'socketpair': {1024: 39.12782112764595, 2048:
-65.32412146891939, 4096: 162.9721378943877, 8192: 25.30569898723389},
-'tcp': {1024: 15.744732006826235, 2048: 38.710435498854565, 4096:
-82.16748391669286, 8192: 134.57106615749748}, 'uds': {1024:
-0.10912914945128055, 2048: 0.06786973130313596, 4096:
-0.18317543154346924, 8192: 0.08248626434790438}}, {'msg_queue': {1024:
-0.11100467330422437, 2048: 0.13008069645108133, 4096:
-0.158288796374672, 8192: 0.1215073603766968}, 'named_pipe': {1024:
-73.3392041589776, 2048: 24.89879370355345, 4096: 42.39128652328577,
-8192: 34.067821818385106}, 'pipe': {1024: 56.3953441721408, 2048:
-43.54290340995699, 4096: 50.87995500803582, 8192: 35.8759686925718},
-'socketpair': {1024: 39.12782112764595, 2048: 65.32412146891939, 4096:
-162.9721378943877, 8192: 25.30569898723389}, 'tcp': {1024:
-15.744732006826235, 2048: 38.710435498854565, 4096: 82.16748391669286,
-8192: 134.57106615749748}, 'uds': {1024: 0.10912914945128055, 2048:
-0.06786973130313596, 4096: 0.18317543154346924, 8192:
-0.08248626434790438}})
++------------+--------------+--------------+--------------+--------------+
+|            |     1024     |     2048     |     4096     |     8192
+|
++------------+--------------+--------------+--------------+--------------+
+| msg_queue  |    21.07     |    21.07     |    21.07     |    21.08
+|
+| named_pipe |    510.96    |    980.06    |   1783.51    |    982.73
+|
+|    pipe    |    419.44    |    593.31    |    788.94    |   1104.64
+|
+| socketpair |    443.06    |    705.74    |   1031.54    |    734.76
+|
+|    tcp     |    417.37    |    761.47    |   1330.19    |   1530.60
+|
+|    uds     |    114.91    |    127.30    |    134.62    |    126.35
+|
++------------+--------------+--------------+--------------+--------------+
 ```
 
 ![](figures/ipc_report_figure1_1.png)\
 
-
-<div style="max-height:1000px;max-width:1500px;overflow:auto;">
-<table border="1" class="dataframe">
-<thead>
-    <tr style="text-align: right;">
-        <th>Block Size / Type</th>
-        <th>1024</th>
-        <th>2048</th>
-        <th>4096</th>
-        <th>8192</th>
-    </tr>
-</thead>
-<tbody>
-    <tr>
-        <th>msg_queue</th>
-        <td></td>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-    </tr>
-    <tr>
-        <th>named_pipe</th>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-    </tr>
-    <tr>
-        <th>pipe</th>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-    </tr>
-    <tr>
-        <th>socketpair</th>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-    </tr>
-    <tr>
-        <th>tcp</th>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-    </tr>
-    <tr>
-        <th>uds</th>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-        <td>x</td>
-    </tr>
-</tbody>
-</table>
-</div>

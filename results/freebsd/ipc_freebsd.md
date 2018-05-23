@@ -34,6 +34,7 @@ shraken@mint-vbox ~/shraken_code/ipc_benchmark $ python benchmark.py -v -t 100 -
 The figure below compares the throughput (MB/sec) for the different IPC methods when varying the block
 size of transmission.  The transfer size for each test is fixed at 100 Megabytes.  
 
+
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -185,7 +186,7 @@ def plotResults(filename):
 
     return (resultMean, resultStd)
 
-(resultMean, resultStd) = plotResults('results/dat/macos_result.dat')
+(resultMean, resultStd) = plotResults('results/dat/freebsd_result.dat')
 
 headers = ['', 
            '{:^12}'.format(IPC_BLOCK_SIZE_1024), 
@@ -204,5 +205,27 @@ for ipcType in typesToParse:
     t.add_row(data)
 
 print(t)
+```
 
 ```
++------------+--------------+--------------+--------------+--------------+
+|            |     1024     |     2048     |     4096     |     8192
+|
++------------+--------------+--------------+--------------+--------------+
+| msg_queue  |    31.35     |    31.33     |    31.30     |    31.35
+|
+| named_pipe |    481.15    |    857.70    |   2164.04    |   1976.68
+|
+|    pipe    |    488.02    |    871.70    |   2107.21    |   1941.09
+|
+| socketpair |   1648.05    |   2720.23    |   2817.04    |   1676.99
+|
+|    tcp     |   1173.02    |   1784.93    |   2678.91    |   3404.71
+|
+|    uds     |    83.89     |    85.67     |    85.97     |    84.06
+|
++------------+--------------+--------------+--------------+--------------+
+```
+
+![](figures/ipc_report_figure1_1.png)\
+

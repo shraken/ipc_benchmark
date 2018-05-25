@@ -3,13 +3,6 @@
 *.html
 *.DS_Store
 .vscode/
-benchmarks/named_pipe/client/client
-benchmarks/named_pipe/server/server
-benchmarks/pipe/main
-benchmarks/msg_queue/client/client
-benchmarks/msg_queue/server/server
-benchmarks/uds/client/client
-benchmarks/uds/server/server
-benchmarks/socketpair/main
-benchmarks/tcp/client/client
-benchmarks/tcp/server/server
+benchmarks/*/client/client
+benchmarks/*/server/server
+benchmarks/*/main

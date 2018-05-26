@@ -13,6 +13,7 @@ IPC_CWD_PIPE_DIR = "benchmarks/pipe/"
 IPC_CWD_SOCKET_PAIR_DIR = "benchmarks/socketpair/"
 IPC_CWD_TCP_DIR = "benchmarks/tcp/"
 IPC_CWD_UDS_DIR = "benchmarks/uds/"
+IPC_CWD_ZMQ_DIR = "benchmarks/zmq/"
 
 IPC_TOTAL_SIZE = 104857600 # 100Mbyte
 IPC_TRIAL_ATTEMPTS = 25
@@ -54,6 +55,12 @@ ipcResults = {
         IPC_BLOCK_SIZE_8192: [],
     },
     'uds': {
+        IPC_BLOCK_SIZE_1024: [],
+        IPC_BLOCK_SIZE_2048: [],
+        IPC_BLOCK_SIZE_4096: [],
+        IPC_BLOCK_SIZE_8192: [],
+    },
+    'zmq': {
         IPC_BLOCK_SIZE_1024: [],
         IPC_BLOCK_SIZE_2048: [],
         IPC_BLOCK_SIZE_4096: [],
@@ -142,7 +149,7 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, dela
         else:
             server_proc.kill()
         
-    print 'benchRow = {}'.format(benchRow)
+    #print 'benchRow = {}'.format(benchRow)
     return benchRow
 
 def ipc_benchmark_run(save_file, trial_runs, verbose):
@@ -151,13 +158,13 @@ def ipc_benchmark_run(save_file, trial_runs, verbose):
 
     for trialRun in xrange(int(trial_runs)):
         for bsize in blockSizes:
-            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_MSG_QUEUE_DIR, single_proc=False)
-            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_NAMED_PIPE_DIR, single_proc=False)
-            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_PIPE_DIR, single_proc=True)
-            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_SOCKET_PAIR_DIR, single_proc=True)
-            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, single_proc=False, delay=2.0, killattempt=False)
-            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_UDS_DIR, single_proc=False, fliporder=True)
-
+            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_MSG_QUEUE_DIR, single_proc=False)
+            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_NAMED_PIPE_DIR, single_proc=False)
+            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_PIPE_DIR, single_proc=True)
+            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_SOCKET_PAIR_DIR, single_proc=True)
+            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, single_proc=False, delay=2.0, killattempt=False)
+            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_UDS_DIR, single_proc=False, fliporder=True)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_ZMQ_DIR, single_proc=False, fliporder=True)
     if verbose:
         global ipcResults
         print 'ipcResults'

@@ -15,7 +15,6 @@
 
 #include <common.h>
 
-#define BUFFER_BYTES_LENGTH 8192
 #define SERVER_PORT "5000"
 #define SERVER_HOST "localhost"
 

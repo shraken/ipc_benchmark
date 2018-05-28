@@ -56,15 +56,13 @@ int parse_arguments(int argc, char *argv[], int *block_size, int *total_size, bo
     return 0;
 }
 
-uint8_t *allocate_buffer(int total_size) {
+uint8_t *allocate_buffer(uint64_t total_size) {
     int i;
     int rand_value;
-    int total_bytes;
-    int total_attempts;
     uint8_t *buffer;
 
     srand(time(NULL));
-    buffer = (uint8_t *) malloc(total_size * 2);
+    buffer = (uint8_t *) malloc(total_size);
 
     for (i = 0; i < total_size; i++) {
         rand_value = rand() % 0xFF;

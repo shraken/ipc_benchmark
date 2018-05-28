@@ -69,9 +69,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("freeing memory buffer A\n");
     free(fbuf);
-    printf("freeing memory buffer B\n");
 
     if (msgctl(msqid, IPC_RMID, NULL) == -1) {
         perror("msgctl");

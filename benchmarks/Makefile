@@ -4,6 +4,7 @@ PIPE = pipe
 SOCKETPAIR = socketpair
 TCP = tcp
 UDS = uds
+ZMQ = zmq
 
 .PHONY: all
 
@@ -18,6 +19,8 @@ all:
 	$(MAKE) -C $(TCP)/server
 	$(MAKE) -C $(UDS)/client
 	$(MAKE) -C $(UDS)/server
+	$(MAKE) -C $(ZMQ)/client
+	$(MAKE) -C $(ZMQ)/server
 
 clean:
 	$(MAKE) -C $(MSG_QUEUE)/client clean
@@ -30,3 +33,5 @@ clean:
 	$(MAKE) -C $(TCP)/server clean
 	$(MAKE) -C $(UDS)/client clean
 	$(MAKE) -C $(UDS)/server clean
+	$(MAKE) -C $(ZMQ)/client clean
+	$(MAKE) -C $(ZMQ)/server clean

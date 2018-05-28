@@ -11,8 +11,6 @@
 #include <czmq.h>
 #include <common.h>
 
-#define BUFFER_BYTES_LENGTH 8192
-
 int main(int argc, char *argv[]) {
     int n;
     int total_bytes;
@@ -25,6 +23,8 @@ int main(int argc, char *argv[]) {
     int block_size;
     int total_size;
 
+    int write_size;
+
     void *context = zmq_ctx_new();
     void *publisher = zmq_socket(context, ZMQ_PUB);
     //int rc = zmq_bind(publisher, "tcp://*:5556");
@@ -33,7 +33,9 @@ int main(int argc, char *argv[]) {
     assert (rc == 0);
     parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
 
+    printf("start allocate buffer\n");
     fbuf = allocate_buffer(total_size);
+    printf("end allocate buffer\n");
 
     if (!fbuf) {
         printf("error could not allocate memory\n");
@@ -44,7 +46,13 @@ int main(int argc, char *argv[]) {
 
     total_bytes = 0;
     while (1) {
-        n = zmq_send(publisher, fbuf + total_bytes, block_size, 0);
+        if ((total_bytes + block_size) < total_size) {
+            write_size = block_size;
+        } else {
+            write_size = (total_size - total_bytes);
+        }
+
+        n = zmq_send(publisher, fbuf + total_bytes, write_size, 0);
         //printf("wrote %d bytes\n", n);
 
         if (n < 0) {

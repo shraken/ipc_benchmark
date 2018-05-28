@@ -32,6 +32,8 @@ int main(int argc, char *argv[]) {
     int block_size;
     int total_size;
 
+    int write_size;
+    
     parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
 
     fbuf = allocate_buffer(total_size);
@@ -57,8 +59,15 @@ int main(int argc, char *argv[]) {
 
     total_bytes = 0;
     while (1) {
-        if ((n = send(s,  fbuf + total_bytes, block_size, 0)) == -1) {
+        if ((total_bytes + block_size) < total_size) {
+            write_size = block_size;
+        } else {
+            write_size = (total_size - total_bytes);
+        }
+
+        if ((n = send(s,  fbuf + total_bytes, write_size, 0)) == -1) {
             perror("send");
+            free(fbuf);
             exit(1);
         }
 

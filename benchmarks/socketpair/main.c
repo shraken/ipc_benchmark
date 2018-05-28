@@ -29,9 +29,9 @@ int main(int argc, char *argv[]) {
     int block_size;
     int total_size;
 
-    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
+    int write_size;
 
-    fbuf = allocate_buffer(total_size);
+    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd) == -1) {
         perror("socketpair");
@@ -46,8 +46,16 @@ int main(int argc, char *argv[]) {
     } else if (child_pid == 0) {
         // child
 
+        fbuf = allocate_buffer(total_size);
+
         while (1) {
-            n = write(fd[1], fbuf + total_bytes, block_size);
+            if ((total_bytes + block_size) < total_size) {
+                write_size = block_size;
+            } else {
+                write_size = (total_size - total_bytes);
+            }
+
+            n = write(fd[1], fbuf + total_bytes, write_size);
 
             if (n < 0) {
                 perror("write");
@@ -61,6 +69,8 @@ int main(int argc, char *argv[]) {
                 break;
             }
         }
+
+        free(fbuf);
     } else {
         // parent
 
@@ -92,7 +102,6 @@ int main(int argc, char *argv[]) {
         print_runtime_stats(pretty_mode, total_bytes, total_attempts, total_time);
         free(tbuf);
     }
-
-    free(fbuf);
+    
     return 0;
 }

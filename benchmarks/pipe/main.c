@@ -25,9 +25,9 @@ int main(int argc, char *argv[]) {
     int block_size;
     int total_size;
 
-    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
+    int write_size;
 
-    fbuf = allocate_buffer(total_size);
+    parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
     
     if (pipe(fd) == -1) {
         perror("pipe");
@@ -43,8 +43,16 @@ int main(int argc, char *argv[]) {
         // child
         close(fd[0]);
 
+        fbuf = allocate_buffer(total_size);
+
         while (1) {
-            n = write(fd[1], fbuf + total_bytes, block_size);
+            if ((total_bytes + block_size) < total_size) {
+                write_size = block_size;
+            } else {
+                write_size = (total_size - total_bytes);
+            }
+
+            n = write(fd[1], fbuf + total_bytes, write_size);
 
             if (n < 0) {
                 perror("write");
@@ -58,6 +66,8 @@ int main(int argc, char *argv[]) {
                 break;
             }
         }
+
+        free(fbuf);
     } else {
         // parent
         close(fd[1]);
@@ -91,6 +101,5 @@ int main(int argc, char *argv[]) {
         free(tbuf);
     }
 
-    free(fbuf);
     return 0;
 }

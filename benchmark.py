@@ -15,15 +15,23 @@ IPC_CWD_TCP_DIR = "benchmarks/tcp/"
 IPC_CWD_UDS_DIR = "benchmarks/uds/"
 IPC_CWD_ZMQ_DIR = "benchmarks/zmq/"
 
-IPC_TOTAL_SIZE = 104857600 # 100Mbyte
-IPC_TRIAL_ATTEMPTS = 25
+#IPC_TOTAL_SIZE = 104857600 # 100Mbyte
+IPC_TOTAL_SIZE = 10485760000 # 1 GByte
+IPC_DEFAULT_TRIAL_ATTEMPTS = 25
 
 IPC_BLOCK_SIZE_1024 = 1024
 IPC_BLOCK_SIZE_2048 = 2048
 IPC_BLOCK_SIZE_4096 = 4096
 IPC_BLOCK_SIZE_8192 = 8192
 
-ipcResults = {
+typesToParse = [ 'msg_queue', 'named_pipe', 'pipe', 'socketpair', 'tcp', 'uds', 'zmq' ]
+blockSizeList = [ 1024, 2048, 4096, 8192, 16384, 32768, 65536 ]
+
+blankList = {key: [] for key in blockSizeList}
+ipcResults = {key: blankList for key in typesToParse}
+
+'''
+ipcResults2 = {
     'msg_queue' : {
         IPC_BLOCK_SIZE_1024: [],
         IPC_BLOCK_SIZE_2048: [],
@@ -67,6 +75,7 @@ ipcResults = {
         IPC_BLOCK_SIZE_8192: [],
     }
 }
+'''
 
 def benchmark_test(block_size, total_size, base_dir, single_proc=False, delay=0, fliporder=False, killattempt=True):
     global ipcResults
@@ -109,6 +118,10 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, dela
             benchRow += line
     else:
         if fliporder:
+            print 'method 1'
+            print 'block_size = {}'.format(block_size)
+            print 'total size = {}'.format(total_size)
+
             client_proc = subprocess.Popen('./client -b {} -c {}'.format(block_size, total_size),
                                            cwd=base_dir + 'client/',
                                            shell=True,
@@ -123,6 +136,11 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, dela
                                            preexec_fn=os.setsid)
             
         else:
+            print 'method 2'
+            print 'delay = {}'.format(delay)
+            print 'block_size = {}'.format(block_size)
+            print 'total size = {}'.format(total_size)
+
             server_proc = subprocess.Popen('./server -b {} -c {}'.format(block_size, total_size),
                                            cwd=base_dir + 'server/',
                                            shell=True,
@@ -142,8 +160,6 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, dela
         for line in client_proc.stdout:
             benchRow += line
 
-        #if killattempt:
-
         if os.uname()[0] == 'Linux':
             os.killpg(os.getpgid(server_proc.pid), signal.SIGTERM)
         else:
@@ -153,18 +169,16 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, dela
     return benchRow
 
 def ipc_benchmark_run(save_file, trial_runs, verbose):
-    blockSizes = [ IPC_BLOCK_SIZE_1024, IPC_BLOCK_SIZE_2048,
-                   IPC_BLOCK_SIZE_4096, IPC_BLOCK_SIZE_8192 ]
-
     for trialRun in xrange(int(trial_runs)):
-        for bsize in blockSizes:
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_MSG_QUEUE_DIR, single_proc=False)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_NAMED_PIPE_DIR, single_proc=False)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_PIPE_DIR, single_proc=True)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_SOCKET_PAIR_DIR, single_proc=True)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, single_proc=False, delay=2.0, killattempt=False)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_UDS_DIR, single_proc=False, fliporder=True)
+        for bsize in blockSizeList:
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_MSG_QUEUE_DIR, single_proc=False)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_NAMED_PIPE_DIR, single_proc=False)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_PIPE_DIR, single_proc=True)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_SOCKET_PAIR_DIR, single_proc=True)
+            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, single_proc=False, delay=25.0, killattempt=False)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_UDS_DIR, single_proc=False, fliporder=True)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_ZMQ_DIR, single_proc=False, fliporder=True)
+    
     if verbose:
         global ipcResults
         print 'ipcResults'
@@ -178,7 +192,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test the DAC, ADC, and PWM function of the Buddy DAQ device')
 
     parser.add_argument('-t,--trials', dest='trial_runs',
-                        nargs='?', const=IPC_TRIAL_ATTEMPTS, type=int,
+                        nargs='?', const=IPC_DEFAULT_TRIAL_ATTEMPTS, type=int,
                         help='number of trials to be run for each IPC test')
     parser.add_argument('-v,--verbose', action='store_true', dest='verbose',
                         help='enable verbose printing')

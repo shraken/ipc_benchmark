@@ -56,6 +56,8 @@ int main(int argc, char *argv[]) {
     int block_size;
     int total_size;
 
+    int write_size;
+
     parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
 
     fbuf = allocate_buffer(total_size);
@@ -126,7 +128,13 @@ int main(int argc, char *argv[]) {
     //printf("server: got connection from %s\n", s);
 
     while (1) {
-        if ((n = send(new_fd,  fbuf + total_bytes, block_size, 0)) == -1) {
+        if ((total_bytes + block_size) < total_size) {
+            write_size = block_size;
+        } else {
+            write_size = (total_size - total_bytes);
+        }
+
+        if ((n = send(new_fd,  fbuf + total_bytes, write_size, 0)) == -1) {
             perror("send");
             exit(1);
         }

@@ -12,7 +12,6 @@
 
 #include <common.h>
 
-#define BUFFER_BYTES_LENGTH 8192
 #define SOCK_PATH "/tmp/ipc_uds"
 
 int main(int argc, char *argv[]) {

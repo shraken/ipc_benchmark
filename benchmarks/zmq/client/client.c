@@ -10,8 +10,6 @@
 #include <czmq.h>
 #include <common.h>
 
-#define BUFFER_BYTES_LENGTH 8192
-
 int main(int argc, char *argv[]) {
     int n;
     int total_bytes;

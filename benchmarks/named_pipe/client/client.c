@@ -9,8 +9,6 @@
 
 #include <common.h>
 
-#define BUFFER_BYTES_LENGTH 8192
-
 static char *fifo_name = "/tmp/ipc_fifo";
 
 int main(int argc, char *argv[]) {

@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         n = recv(sockfd, tbuf, block_size, 0);
 
-        if (n <= 0) {
+        if (n == -1) {
             perror("recv");
             exit(1);
         } else {

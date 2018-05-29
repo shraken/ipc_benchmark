@@ -23,59 +23,81 @@ IPC_BLOCK_SIZE_1024 = 1024
 IPC_BLOCK_SIZE_2048 = 2048
 IPC_BLOCK_SIZE_4096 = 4096
 IPC_BLOCK_SIZE_8192 = 8192
+IPC_BLOCK_SIZE_16384 = 16384
+IPC_BLOCK_SIZE_32768 = 32768
+IPC_BLOCK_SIZE_65536 = 65536
 
 typesToParse = [ 'msg_queue', 'named_pipe', 'pipe', 'socketpair', 'tcp', 'uds', 'zmq' ]
 blockSizeList = [ 1024, 2048, 4096, 8192, 16384, 32768, 65536 ]
 
 blankList = {key: [] for key in blockSizeList}
-ipcResults = {key: blankList for key in typesToParse}
+#ipcResults = {key: blankList for key in typesToParse}
 
-'''
-ipcResults2 = {
+ipcResults = {
     'msg_queue' : {
         IPC_BLOCK_SIZE_1024: [],
         IPC_BLOCK_SIZE_2048: [],
         IPC_BLOCK_SIZE_4096: [],
         IPC_BLOCK_SIZE_8192: [],
+        IPC_BLOCK_SIZE_16384: [],
+        IPC_BLOCK_SIZE_32768: [],
+        IPC_BLOCK_SIZE_65536: [],
     },
     'named_pipe': {
         IPC_BLOCK_SIZE_1024: [],
         IPC_BLOCK_SIZE_2048: [],
         IPC_BLOCK_SIZE_4096: [],
         IPC_BLOCK_SIZE_8192: [],
+        IPC_BLOCK_SIZE_16384: [],
+        IPC_BLOCK_SIZE_32768: [],
+        IPC_BLOCK_SIZE_65536: [],
     },
     'pipe': {
         IPC_BLOCK_SIZE_1024: [],
         IPC_BLOCK_SIZE_2048: [],
         IPC_BLOCK_SIZE_4096: [],
         IPC_BLOCK_SIZE_8192: [],
+        IPC_BLOCK_SIZE_16384: [],
+        IPC_BLOCK_SIZE_32768: [],
+        IPC_BLOCK_SIZE_65536: [],
     },
     'socketpair': {
         IPC_BLOCK_SIZE_1024: [],
         IPC_BLOCK_SIZE_2048: [],
         IPC_BLOCK_SIZE_4096: [],
         IPC_BLOCK_SIZE_8192: [],
+        IPC_BLOCK_SIZE_16384: [],
+        IPC_BLOCK_SIZE_32768: [],
+        IPC_BLOCK_SIZE_65536: [],
     },
     'tcp': {
         IPC_BLOCK_SIZE_1024: [],
         IPC_BLOCK_SIZE_2048: [],
         IPC_BLOCK_SIZE_4096: [],
         IPC_BLOCK_SIZE_8192: [],
+        IPC_BLOCK_SIZE_16384: [],
+        IPC_BLOCK_SIZE_32768: [],
+        IPC_BLOCK_SIZE_65536: [],
     },
     'uds': {
         IPC_BLOCK_SIZE_1024: [],
         IPC_BLOCK_SIZE_2048: [],
         IPC_BLOCK_SIZE_4096: [],
         IPC_BLOCK_SIZE_8192: [],
+        IPC_BLOCK_SIZE_16384: [],
+        IPC_BLOCK_SIZE_32768: [],
+        IPC_BLOCK_SIZE_65536: [],
     },
     'zmq': {
         IPC_BLOCK_SIZE_1024: [],
         IPC_BLOCK_SIZE_2048: [],
         IPC_BLOCK_SIZE_4096: [],
         IPC_BLOCK_SIZE_8192: [],
+        IPC_BLOCK_SIZE_16384: [],
+        IPC_BLOCK_SIZE_32768: [],
+        IPC_BLOCK_SIZE_65536: [],
     }
 }
-'''
 
 def benchmark_test(block_size, total_size, base_dir, single_proc=False, delay=0, fliporder=False, killattempt=True):
     global ipcResults
@@ -175,7 +197,7 @@ def ipc_benchmark_run(save_file, trial_runs, verbose):
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_NAMED_PIPE_DIR, single_proc=False)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_PIPE_DIR, single_proc=True)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_SOCKET_PAIR_DIR, single_proc=True)
-            #benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, single_proc=False, delay=25.0, killattempt=False)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, single_proc=False, delay=25.0, killattempt=False)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_UDS_DIR, single_proc=False, fliporder=True)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_ZMQ_DIR, single_proc=False, fliporder=True)
     

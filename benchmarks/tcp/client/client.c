@@ -18,6 +18,8 @@
 #define SERVER_PORT "5000"
 #define SERVER_HOST "localhost"
 
+#define DEFAULT_EXPIRATION_COUNTS 1000
+
 // based off Beej's Network example code
 // https://beej.us/guide/bgnet/html/multi/clientserver.html#simpleserver
 
@@ -46,6 +48,9 @@ int main(int argc, char *argv[]) {
     int block_size;
     int total_size;
 
+    int connect_count = 0;
+    int recv_size;
+
     parse_arguments(argc, argv, &block_size, &total_size, &pretty_mode);
 
     memset(&hints, 0, sizeof hints);
@@ -57,22 +62,31 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    for(p = servinfo; p != NULL; p = p->ai_next) {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                p->ai_protocol)) == -1) {
-            perror("client: socket");
-            continue;
+    while (1) {
+        for(p = servinfo; p != NULL; p = p->ai_next) {
+            if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                    p->ai_protocol)) == -1) {
+                perror("client: socket");
+                continue;
+            }
+
+            if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+                close(sockfd);
+                continue;
+            } else {
+                goto connectComplete;
+            }
         }
 
-        if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-            close(sockfd);
-            perror("client: connect");
-            continue;
+        if (connect_count >= DEFAULT_EXPIRATION_COUNTS) {
+            return -1;
         }
 
-        break;
+        connect_count++;
+        usleep(100000);
     }
 
+    connectComplete:
     if (p == NULL) {
         fprintf(stderr, "client: failed to connect\n");
         return 2;
@@ -90,16 +104,23 @@ int main(int argc, char *argv[]) {
     gettimeofday(&t_start, NULL);
 
     while (1) {
-        n = recv(sockfd, tbuf, block_size, 0);
+        if ((total_bytes + block_size) > total_size) {
+            recv_size = (total_size - total_bytes);
+        } else {
+            recv_size = block_size;
+        }
+
+        n = recv(sockfd, tbuf, recv_size, 0);
 
         if (n == -1) {
-            perror("recv");
+            //perror("recv");
             exit(1);
         } else {
             total_bytes += n;
             total_attempts++;
         }
 
+        //printf("total_bytes = %d\n", total_bytes);
         if (total_bytes >= total_size) {
             break;
         }

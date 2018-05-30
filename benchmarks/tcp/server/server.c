@@ -125,16 +125,16 @@ int main(int argc, char *argv[]) {
     inet_ntop(their_addr.ss_family,
         get_in_addr((struct sockaddr *)&their_addr),
         s, sizeof s);
-    //printf("server: got connection from %s\n", s);
+    printf("server: got connection from %s\n", s);
 
     while (1) {
-        if ((total_bytes + block_size) < total_size) {
+        if ((total_bytes + block_size) <= total_size) {
             write_size = block_size;
         } else {
             write_size = (total_size - total_bytes);
         }
 
-        if ((n = send(new_fd,  fbuf + total_bytes, write_size, 0)) == -1) {
+        if ((n = send(new_fd, fbuf + (total_bytes % total_size), block_size, 0)) == -1) {
             perror("send");
             exit(1);
         }
@@ -144,9 +144,11 @@ int main(int argc, char *argv[]) {
             total_attempts++;
         }
 
+        /*
         if (total_bytes >= total_size) {
             break;
         }
+        */
     }
 
     free(fbuf);

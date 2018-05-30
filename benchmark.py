@@ -15,9 +15,11 @@ IPC_CWD_TCP_DIR = "benchmarks/tcp/"
 IPC_CWD_UDS_DIR = "benchmarks/uds/"
 IPC_CWD_ZMQ_DIR = "benchmarks/zmq/"
 
-#IPC_TOTAL_SIZE = 104857600 # 100Mbyte
-IPC_TOTAL_SIZE = 10485760000 # 1 GByte
+IPC_TOTAL_SIZE = 104857600 # 100Mbyte
+#IPC_TOTAL_SIZE = 10485760000 # 1 GByte
 IPC_DEFAULT_TRIAL_ATTEMPTS = 25
+
+BENCHMARK_LOOP_WAIT_PERIOD = 2.0
 
 IPC_BLOCK_SIZE_1024 = 1024
 IPC_BLOCK_SIZE_2048 = 2048
@@ -105,6 +107,9 @@ def benchmark_test(block_size, total_size, base_dir, single_proc=False, delay=0,
     for attempts in xrange(5):
         result = benchmark_test_run(block_size, total_size, base_dir, single_proc, delay, fliporder, killattempt)
     
+        print 'result'
+        print result
+
         try:
             resultSplit = result.split(',')
             nameSplit = resultSplit[0].split('/')
@@ -127,6 +132,9 @@ def benchmark_test(block_size, total_size, base_dir, single_proc=False, delay=0,
 
 def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, delay=0, fliporder=False, killattempt=True):
     if single_proc:
+        print 'block_size = {}'.format(block_size)
+        print 'total size = {}'.format(total_size)
+
         both_proc = subprocess.Popen('./main -b {} -c {}'.format(block_size, total_size),
                                      cwd=base_dir,
                                      shell=True,
@@ -140,7 +148,6 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, dela
             benchRow += line
     else:
         if fliporder:
-            print 'method 1'
             print 'block_size = {}'.format(block_size)
             print 'total size = {}'.format(total_size)
 
@@ -158,8 +165,6 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, dela
                                            preexec_fn=os.setsid)
             
         else:
-            print 'method 2'
-            print 'delay = {}'.format(delay)
             print 'block_size = {}'.format(block_size)
             print 'total size = {}'.format(total_size)
 
@@ -192,15 +197,18 @@ def benchmark_test_run(block_size, total_size, base_dir, single_proc=False, dela
 
 def ipc_benchmark_run(save_file, trial_runs, verbose):
     for trialRun in xrange(int(trial_runs)):
+        print 'Running trial {}'.format(trialRun)
+
         for bsize in blockSizeList:
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_MSG_QUEUE_DIR, single_proc=False)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_NAMED_PIPE_DIR, single_proc=False)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_PIPE_DIR, single_proc=True)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_SOCKET_PAIR_DIR, single_proc=True)
-            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, single_proc=False, delay=25.0, killattempt=False)
+            benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_TCP_DIR, single_proc=False, killattempt=True)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_UDS_DIR, single_proc=False, fliporder=True)
             benchmark_test(bsize, IPC_TOTAL_SIZE, IPC_CWD_ZMQ_DIR, single_proc=False, fliporder=True)
-    
+            time.sleep(BENCHMARK_LOOP_WAIT_PERIOD)
+
     if verbose:
         global ipcResults
         print 'ipcResults'

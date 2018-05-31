@@ -45,8 +45,11 @@ IPC_BLOCK_SIZE_1024 = 1024
 IPC_BLOCK_SIZE_2048 = 2048
 IPC_BLOCK_SIZE_4096 = 4096
 IPC_BLOCK_SIZE_8192 = 8192
+IPC_BLOCK_SIZE_16384 = 16384
+IPC_BLOCK_SIZE_32768 = 32768
+IPC_BLOCK_SIZE_65536 = 65536
 
-typesToParse = [ 'msg_queue', 'named_pipe', 'pipe', 'socketpair', 'tcp', 'uds' ]
+typesToParse = [ 'msg_queue', 'named_pipe', 'pipe', 'socketpair', 'tcp', 'uds', 'zmq' ]
 blockSizeList = [ IPC_BLOCK_SIZE_1024, IPC_BLOCK_SIZE_2048, 
                   IPC_BLOCK_SIZE_4096, IPC_BLOCK_SIZE_8192 ]
 
@@ -58,9 +61,12 @@ def plotResults(filename):
     with open(filename, "rb") as handle:
         result = pickle.load(handle)
     
-    colorTypes = [ 'r', 'b', 'g', 'c', 'm', 'y' ]
+    print('recorded results')
+    print(result)
 
-    n_groups = 4
+    colorTypes = [ 'r', 'b', 'g', 'c', 'm', 'y', 'k' ]
+
+    n_groups = 5
     fig, ax = plt.subplots()
 
     index = np.arange(n_groups)
@@ -80,36 +86,63 @@ def plotResults(filename):
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'named_pipe': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'pipe': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'socketpair': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'tcp': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'uds': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
+        },
+        'zmq': {
+            IPC_BLOCK_SIZE_1024: [],
+            IPC_BLOCK_SIZE_2048: [],
+            IPC_BLOCK_SIZE_4096: [],
+            IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         }
     }
 
@@ -119,49 +152,88 @@ def plotResults(filename):
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'named_pipe': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'pipe': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'socketpair': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'tcp': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         },
         'uds': {
             IPC_BLOCK_SIZE_1024: [],
             IPC_BLOCK_SIZE_2048: [],
             IPC_BLOCK_SIZE_4096: [],
             IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
+        },
+        'zmq': {
+            IPC_BLOCK_SIZE_1024: [],
+            IPC_BLOCK_SIZE_2048: [],
+            IPC_BLOCK_SIZE_4096: [],
+            IPC_BLOCK_SIZE_8192: [],
+            IPC_BLOCK_SIZE_16384: [],
+            IPC_BLOCK_SIZE_32768: [],
+            IPC_BLOCK_SIZE_65536: [],
         }
     }
 
     for idx, typeParse in enumerate(typesToParse):
         means_temp = ( np.mean(result[typeParse][IPC_BLOCK_SIZE_1024]),
                        np.mean(result[typeParse][IPC_BLOCK_SIZE_2048]),
-                       np.mean(result[typeParse][IPC_BLOCK_SIZE_4096]),
-                       np.mean(result[typeParse][IPC_BLOCK_SIZE_8192]) )
+                       np.mean(result[typeParse][IPC_BLOCK_SIZE_8192]),
+                       np.mean(result[typeParse][IPC_BLOCK_SIZE_16384]),
+                       np.mean(result[typeParse][IPC_BLOCK_SIZE_65536]) )
 
         stds_temp = ( np.std(result[typeParse][IPC_BLOCK_SIZE_1024]),
                       np.std(result[typeParse][IPC_BLOCK_SIZE_2048]),
-                      np.std(result[typeParse][IPC_BLOCK_SIZE_4096]),
-                      np.std(result[typeParse][IPC_BLOCK_SIZE_8192]) )
+                      np.std(result[typeParse][IPC_BLOCK_SIZE_8192]),
+                      np.std(result[typeParse][IPC_BLOCK_SIZE_16384]),
+                      np.std(result[typeParse][IPC_BLOCK_SIZE_65536]) )
+
+        #print('typeParse')
+        #print(typeParse)
+        #print('means_temp')
+        #print(means_temp)
+
+        #print('means_temp')
+        #print(means_temp)
+        #print('stds_temp')
+        #print(stds_temp)
 
         rects_temp = plt.bar(index + (idx * bar_width), means_temp, bar_width,
                              alpha=opacity,
@@ -176,8 +248,8 @@ def plotResults(filename):
 
     plt.xlabel('Type')
     plt.ylabel('Rate (MB/sec)')
-    plt.title('IPC Throughput v. Block size')
-    plt.xticks(index + bar_width / 2, ('1024', '2048', '4096', '8192'))
+    plt.title('IPC Throughput v. Block size - {}'.format(filename))
+    plt.xticks(index + bar_width / 2, ('1024', '2048', '8192', '16384',  '65536'))
     plt.legend()
 
     plt.tight_layout()
@@ -185,7 +257,7 @@ def plotResults(filename):
 
     return (resultMean, resultStd)
 
-(resultMean, resultStd) = plotResults('results/dat/macos_result.dat')
+(resultMean, resultStd) = plotResults('linux_5_30_2018.dat')
 
 headers = ['', 
            '{:^12}'.format(IPC_BLOCK_SIZE_1024), 

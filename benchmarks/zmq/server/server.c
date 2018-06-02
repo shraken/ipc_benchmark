@@ -44,15 +44,19 @@ int main(int argc, char *argv[]) {
         printf("allocation finished\n");
     }
 
+    int zmq_flag = 0;
+
     total_bytes = 0;
     while (1) {
         if ((total_bytes + block_size) < total_size) {
             write_size = block_size;
+            zmq_flag = ZMQ_SNDMORE;
         } else {
             write_size = (total_size - total_bytes);
+            zmq_flag = 0;
         }
 
-        n = zmq_send(publisher, fbuf + total_bytes, write_size, 0);
+        n = zmq_send(publisher, fbuf + total_bytes, write_size, zmq_flag);
         //printf("wrote %d bytes\n", n);
 
         if (n < 0) {
@@ -65,6 +69,7 @@ int main(int argc, char *argv[]) {
 
         if (total_bytes >= total_size) {
             total_bytes = (total_bytes % total_size);
+            break;
         }
     }
 

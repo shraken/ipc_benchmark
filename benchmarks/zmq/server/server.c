@@ -48,27 +48,10 @@ int main(int argc, char *argv[]) {
 
     total_bytes = 0;
     while (1) {
-        if ((total_bytes + block_size) < total_size) {
-            write_size = block_size;
-            zmq_flag = ZMQ_SNDMORE;
-        } else {
-            write_size = (total_size - total_bytes);
-            zmq_flag = 0;
-        }
-
-        n = zmq_send(publisher, fbuf + total_bytes, write_size, zmq_flag);
-        //printf("wrote %d bytes\n", n);
+        n - zmq_send(publisher, fbuf, total_size, 0);
 
         if (n < 0) {
             perror("zmq_send");
-            break;
-        } else if (n > 0) {
-            total_bytes += n;
-            total_attempts++;
-        }
-
-        if (total_bytes >= total_size) {
-            total_bytes = (total_bytes % total_size);
             break;
         }
     }

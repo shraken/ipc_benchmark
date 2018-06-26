@@ -44,7 +44,6 @@ int main(int argc, char *argv[]) {
     // read 
     while (1) {
         n = zmq_recv(subscriber, tbuf, block_size, 0);
-        //printf("got %d bytes\n", n);
 
         if (n < 0) {
             perror("zmq_recv");
